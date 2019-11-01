@@ -43,8 +43,9 @@ def sentiment(s):
 
 def POS_Tagging():
     try:
-        df = pd.read_csv('zomatoscore.csv')
-        reviews = df['reviews_list']
+        df = pd.read_csv('imdb_master.csv')
+        df = df[:100]
+        reviews = df['review']
         word_list_col = []        
         for i in range(0,reviews.size):
             words = nltk.word_tokenize(str(reviews.loc[i]))
@@ -62,9 +63,9 @@ def POS_Tagging():
             word_list_col.append(word_list)
             # df.loc[i,'Secondmax_contributing_word'] = word2
         df['word_list'] = word_list_col
-        df.to_csv('zomatoword.csv')
+        df.to_csv('reviewword.csv')
         # df = pd.read_csv('zomatoword.csv')
-        # print(df)  
+        print(df)  
         with open("data/tagging.pkl", "wb") as fp:
             pickle.dump(df, fp)
     except Exception as e:
