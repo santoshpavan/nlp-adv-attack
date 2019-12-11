@@ -43,31 +43,40 @@ def sentiment(s):
 
 def POS_Tagging():
     try:
-        df = pd.read_csv('imdb_master.csv')
-        df = df[:100]
-        reviews = df['review']
-        word_list_col = []        
+        df = pd.read_csv('processedZomato_fullFinaltest.csv')
+        reviews = df['Review']
+        label = df['Rating']
+        word_list_col = []
+        print(reviews.size)        
         for i in range(0,reviews.size):
+            word_list = []
             words = nltk.word_tokenize(str(reviews.loc[i]))
             tagged = nltk.pos_tag(words)
             key_entities = list(filter(lambda word: word[1]=='JJ' or word[1]=='JJR' or word[1]=='JJS' or word[1]=='VB' or word[1]=='VBD' or word[1]=='VBG' or word[1]=='VBN' or word[1]=='VBP' or word[1]=='VBZ', tagged))
-            word_list = random.choices(key_entities, k=int(len(key_entities)/2))
-            for i in range(0,len(word_list)):
-                word_list[i] = word_list[i][0]
-            # score1=0.0
-            # score2=0.0
-            # for i in range(len(word_list)):
-            #     f = sentiment(word_list[i][0])
-            #     temp = word_list[i]
-            #     word_list[i] = (word_list[i][0], f[3])
-            word_list_col.append(word_list)
-            # df.loc[i,'Secondmax_contributing_word'] = word2
+            # word_list = random.choices(key_entities, k = 12 if len(key_entities)>=12 else len(key_entities))
+            for j in range(0, len(key_entities)):
+                f = sentiment(key_entities[j][0])
+                if label.loc[i] < 3:
+                    if f[3]<0:
+                        word_list.append(key_entities[j][0])
+                else:
+                    if f[3]>0:
+                        word_list.append(key_entities[j][0])
+            word_list = random.choices(word_list, k = 12) if len(word_list)>=12 else word_list
+
+            # for j in range(0, len(word_list)):
+            #     word_list[i] = word_list[i][0]
+            word_list_col.append(word_list)  
+
         df['word_list'] = word_list_col
-        df.to_csv('reviewword.csv')
-        # df = pd.read_csv('zomatoword.csv')
-        print(df)  
-        with open("data/tagging.pkl", "wb") as fp:
+        
+        print("generating pickle")          
+        
+        df.to_csv('zomato_test_reviewword.csv')
+
+        with open("data/zomato_tagging_test.pkl", "wb") as fp:
             pickle.dump(df, fp)
+            
     except Exception as e:
         print(str(e))                
 
